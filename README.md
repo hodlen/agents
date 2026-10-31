@@ -32,3 +32,4 @@ The installer links instructions and skills, merges user settings and hooks, and
 | [python-patterns](skills/python-patterns/SKILL.md) | Handle Python compatibility, cached resource lifetimes, and pandas behavior. |
 | [marimo-patterns](skills/marimo-patterns/SKILL.md) | Keep Marimo cell dependencies, state, display, and notebook execution correct. |
 | [data-engineering](skills/data-engineering/SKILL.md) | Preserve data meaning across joins, time handling, conversions, aggregation, and reruns. |
+| [writing](skills/writing/SKILL.md) | Write docs, skills, and PR text whose skim path carries the essentials in one minute. |

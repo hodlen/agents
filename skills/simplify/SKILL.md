@@ -11,22 +11,17 @@ Target: the argument if given, else `git diff @{upstream}...HEAD` plus `git diff
 
 ## Phase 1: Review (4 angles)
 
-Metrics belong to the analyzed worktree in `.metrics/`, excluded through the global Git ignore file by `install.py`. Use reports whose source and analysis inputs match the reviewed code; retained reports are evidence only while those inputs remain applicable.
-
-Run from the worktree root and collect reports for the reviewer:
+Run both tools from the worktree root, then give their reports to the reviewer.
 
 ```sh
-crapper --changed-since <ref> --coverage-command '<project coverage command>'
-dryer
+crapper --changed-since <ref> --coverage-command '<project coverage command>'  # or --no-coverage
+dryer                                                                          # whole tree, so unchanged code can match
 ```
 
-`--changed-since` selects the target's source files: changes since the merge base of `<ref>` and HEAD, including untracked files, without tests. Use a ref target as `<ref>`, and `@{upstream}` (falling back to `main`) for the default target; pass path targets as paths instead. `--changed` covers uncommitted work only.
-
-Use an explicit project coverage command, or `--no-coverage` for complexity alone. The command must write the reports crapper reads (`crapper --help`). Check coverage failures and all-zero reports explicitly: a successful exit does not establish valid coverage. Record unavailable coverage or tools as verification gaps. Run dryer across the tree so unchanged implementations remain comparison partners; review the pairs involving the target files.
-
-Record report paths in the ledger and retain evidence needed for resumption or acceptance in the durable task record.
-
-Signals are candidates, not targets. A CRAP score above 10 asks whether a promised behavior lacks a test or one function mixes decisions; accept case dispatch with its reason. A duplicate pair feeds Reuse and the third-occurrence rule. Never split, extract, or add tests only to move a score.
+- `<ref>` is the ref target, else `@{upstream}`, else `main`. Pass path targets as paths instead of `--changed-since`.
+- If every function shows 0% coverage, fix the coverage command or record the gap; a zero exit does not prove coverage, and the command may have written where crapper does not read (`crapper --help`). A missing tool is a gap too.
+- Reports in `.metrics/` describe the code they ran on. Rerun after edits, and keep in the task directory only what resumption or acceptance needs.
+- CRAP above 10 asks whether a promised behavior lacks a test or one function mixes decisions; never split, extract, or add tests only to move the score. Case dispatch can stay, with its reason. A dryer pair involving the target feeds Reuse and the third-occurrence rule.
 
 Use one fresh reviewer for all four angles. Without agents, cover all four angles yourself. Split across agents only when the diff exceeds about 300 changed lines and spans independent modules. Give the reviewer the diff, authorized scope, explicit constraints, accepted decisions and their reasons, and ledger paths with applicable sections (see `Agent ledgers`) if present. Verify conclusions independently. Review user edits, including deletions, as the current design. Each finding names the file, line, issue, concrete cost, and existing or simpler alternative.
 

@@ -104,6 +104,8 @@ Test promised behavior at consumer boundaries, including supported failures.
 
 ## Durable artifacts
 
+Write for domain experts and engineers. Open each artifact with what its reader needs first, enough to stop there; order the rest by how often it is needed. State defaults before exceptions, and prefer one example to a paragraph. Load `writing` before writing durable prose.
+
 Code is the primary executable spec. Keep accepted outcomes, decisions, assumptions, and current gaps at their existing owners, replacing superseded claims. Follow repository conventions (`README.md`, `docs/`, `spec/`); owning code links its spec section. Each spec opens with a one-minute contract index, then non-trivial pitfalls and missing domain definitions; implementation details stay in code. Reuse exact public-interface identifiers. Prefer GFM. Artifacts (code, names, tests, plans, PRs, commits) must stand alone; remove session-only scaffolding and retire temporary artifacts after preserving necessary evidence.
 
 ### Explain guarantees at their owning layer
