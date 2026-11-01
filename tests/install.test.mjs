@@ -1,11 +1,12 @@
 // install.py promises a rerunnable install: a second run in the same shell,
 // before PATH picks up uv's tool directory, still merges every setting, and
 // leaves each file as the first run did. It also replaces gate hooks left by a
-// moved checkout without touching the user's other hooks. Integration check:
+// moved checkout without touching the user's other hooks, and lets Claude Code
+// reach the resolved temp dir that scratch links point into. Integration check:
 // it installs the real tools, so it needs uv and network access.
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, realpathSync } from 'node:fs';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -63,6 +64,9 @@ test('a second install in an unrefreshed shell completes with the same files', {
   assert.deepEqual(stop.filter(command => command.endsWith('cleanup-gate.sh')), [gate]);
   assert.ok(stop.includes('/usr/bin/true'));
   assert.ok(settings.hooks.Stop.some(group => group.matcher === 'kept-empty'));
+  // Scratch links resolve into the temp dir; an unresolved /var/folders entry
+  // on macOS would still leave them outside Claude Code's working directories.
+  assert.ok(settings.permissions.additionalDirectories.includes(realpathSync(tmpdir())));
   const ignored = afterFirst[3].split('\n');
   for (const pattern of ['/.metrics/', '/.coverage', '/target/coverage/']) {
     assert.equal(ignored.filter(line => line === pattern).length, 1, pattern);

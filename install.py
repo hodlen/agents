@@ -15,7 +15,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
-from tempfile import NamedTemporaryFile
+from tempfile import NamedTemporaryFile, gettempdir
 
 import tomlkit
 
@@ -126,8 +126,14 @@ def main() -> None:
         if rule not in denied:
             denied.append(rule)
     directories = default_if_null(permissions, "additionalDirectories", [])
-    if str(state) not in directories:
-        directories.append(str(state))
+    # AGENTS.md creates scratch under ${TMPDIR:-/tmp} and links it from the
+    # state directory. Claude Code checks a link's resolved target, and macOS
+    # resolves TMPDIR from /var/folders to /private/var/folders. Codex's
+    # workspace-write sandbox already permits TMPDIR, so its roots omit it.
+    scratch = Path(gettempdir()).resolve()
+    for directory in (str(state), str(scratch)):
+        if directory not in directories:
+            directories.append(directory)
     merge_hooks(claude)
     write_if_changed(claude_path, json.dumps(claude, indent=2, ensure_ascii=False) + "\n")
 
