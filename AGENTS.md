@@ -124,7 +124,9 @@ Use conjunctions or separate sentences to express relationships; never use dashe
 
 Ledgers and journals hold session history outside durable-artifact rules; durable artifacts state independent contracts.
 
-Store them apart from scratch in `${XDG_STATE_HOME:-~/.local/state}/agents/<repo-or-project>/<branch-or-topic>-<YYYY-MM-DD>/`. Use the task's start date; reuse its directory across sessions and days.
+Store ledgers apart from scratch under `${XDG_STATE_HOME:-~/.local/state}/agents/`, normally as `<repo-or-project>/{<routine>/CONTRACT.md, <task>-YYYY-MM-DD/CONTRACT.md}`. Routines are undated; task dates mark their start. Reuse both across sessions. Add nesting as needed; optional parent `CONTRACT.md` files govern/index children. Autonomously reuse, deduplicate, and minimize directories.
+
+Superagents share a `superagent` parent ledger for cross-project work, e.g. `.../agents/superagent/{CONTRACT.md, monitor/{CONTRACT.md, ...}, setup-2026-11-17/{CONTRACT.md, ...}}`.
 
 Create scratch with `mktemp -d "${TMPDIR:-/tmp}/<repo-or-project>-<branch-or-topic>-XXXXXX"` and link it from the task directory under a descriptive name. Reuse linked scratch by default; add another for isolation. Copy evidence into the task directory, never link it, before relying on it.
 
