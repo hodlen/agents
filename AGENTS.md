@@ -128,13 +128,13 @@ Store ledgers apart from scratch under `${XDG_STATE_HOME:-~/.local/state}/agents
 
 Superagents share a `superagent` parent ledger for cross-project work, e.g. `.../agents/superagent/{CONTRACT.md, monitor/{CONTRACT.md, ...}, setup-2026-11-17/{CONTRACT.md, ...}}`.
 
-Create scratch with `mktemp -d "${TMPDIR:-/tmp}/<repo-or-project>-<branch-or-topic>-XXXXXX"` and link it from the task directory under a descriptive name. Reuse linked scratch by default; add another for isolation. Copy evidence into the task directory, never link it, before relying on it.
+Create scratch with `mktemp -d "${TMPDIR:-/tmp}/<repo-or-project>-<branch-or-topic>-XXXXXX"` and link it descriptively from the owning ledger directory. Reuse linked scratch; add another for isolation. Copy evidence there before relying on it; never link evidence.
 
-For approved plans/contracts or work spanning review stages, create `CONTRACT.md` if absent with YAML frontmatter `status: active`. Group numbered outcomes, scope and exclusions, approved contracts with examples, decisions with reasons, delegations, and follow-ups by task. Reference shared agreements. Record all user decisions; only these change agreements. Maintain progress and evidence. Keep follow-ups here without separate TODO files; organize other session notes freely.
+Every routine/task ledger requires `CONTRACT.md`; initialize new contracts with YAML frontmatter `status: active`. Group numbered outcomes, scope and exclusions, approved contracts with examples, decisions with reasons, delegations, and follow-ups by scope. Reference shared agreements. Record all user decisions; only these change agreements. Maintain progress and evidence. Keep follow-ups here without separate TODO files; organize other session notes freely.
 
-Each task section states its scope; a section applies when the request or diff touches that scope, and its reconciled agreements govern acceptance. Other sections provide context; name excluded sections in reports. Ask about unclear scope or conflicts. Contract and PR scopes are independent.
+Each contract section states its scope and governs acceptance when the request or diff touches it. Other sections provide context; report excluded sections. Clarify unclear scopes or conflicts. Contract and PR scopes are independent.
 
-Read applicable ledgers before each stage, after compaction or resumption, and before completion. An active ledger from an earlier session binds only after the user confirms its task continues. Include ledger paths and applicable sections in every report and handoff. Set `status: done` only when the whole task is complete.
+Read applicable ledgers and ancestor contracts before each stage, after compaction or resumption, and before completion. Resume prior work only under the current request or standing user authorization. Include ledger paths and applicable sections in every report and handoff. Set `status: done` only when the entire contract scope is complete; recurring routines remain active between runs.
 
 ## Tooling and repository safety
 
