@@ -23,7 +23,7 @@ dryer                                                                          #
 - Reports in `.metrics/` describe the code they ran on. Rerun after edits, and keep in the task directory only what resumption or acceptance needs.
 - CRAP above 10 asks whether a promised behavior lacks a test or one function mixes decisions; never split, extract, or add tests only to move the score. Case dispatch can stay, with its reason. A dryer pair involving the target feeds Reuse and the third-occurrence rule.
 
-Use one fresh reviewer for all four angles. Without agents, cover all four angles yourself. Split across agents only when the diff exceeds about 300 changed lines and spans independent modules. Give the reviewer the diff, authorized scope, explicit constraints, accepted decisions and their reasons, and ledger paths with applicable sections (see `Agent ledgers`) if present. Verify conclusions independently. Review user edits, including deletions, as the current design. Each finding names the file, line, issue, concrete cost, and existing or simpler alternative.
+Use one fresh reviewer for all four angles. Without agents, cover all four angles yourself. Split across agents only when the diff exceeds about 300 changed lines and spans independent modules. Give the reviewer the diff, authorized scope, explicit constraints, accepted decisions and their reasons, and ledger paths with applicable agreements (see `Agent ledgers`) if present. Verify conclusions independently. Review user edits, including deletions, as the current design. Each finding names the file, line, issue, concrete cost, and existing or simpler alternative.
 
 ### Reuse
 

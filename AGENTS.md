@@ -122,23 +122,31 @@ Use conjunctions or separate sentences to express relationships; never use dashe
 
 ## Agent ledgers
 
-Ledgers and journals hold session history outside durable-artifact rules; durable artifacts state independent contracts.
+Ledgers hold session history outside durable-artifact rules.
 
-Store ledgers apart from scratch under `${XDG_STATE_HOME:-~/.local/state}/agents/`, normally as `<repo-or-project>/{<routine>/CONTRACT.md, <task>-YYYY-MM-DD/CONTRACT.md}`. Routines are undated; task dates mark their start. Reuse both across sessions. Add nesting as needed; optional parent `CONTRACT.md` files govern/index children. Autonomously reuse, deduplicate, and minimize directories.
+A ledger is a directory under `${XDG_STATE_HOME:-~/.local/state}/agents/` for one scope of work: a routine, which recurs under standing authorization and stays undated, or a task, which ends and carries its start date.
 
-Superagents share a `superagent` parent ledger for cross-project work, e.g. `.../agents/superagent/{CONTRACT.md, monitor/{CONTRACT.md, ...}, setup-2026-11-17/{CONTRACT.md, ...}}`.
+```
+agents/superagent/               cross-project
+agents/superagent/monitor/       routine
+agents/shop/refunds-2026-11-18/  task
+```
 
-Create scratch with `mktemp -d "${TMPDIR:-/tmp}/<repo-or-project>-<branch-or-topic>-XXXXXX"` and link it descriptively from the owning ledger directory. Reuse linked scratch; add another for isolation. Copy evidence there before relying on it; never link evidence.
+Each agreement lives once, in the narrowest ledger covering everything it governs. Nest each ledger under the one whose scope contains it; its agreements only narrow its ancestors'.
 
-Every routine/task ledger requires `CONTRACT.md`; initialize new contracts with YAML frontmatter `status: active`. Group numbered outcomes, scope and exclusions, approved contracts with examples, decisions with reasons, delegations, and follow-ups by scope. Reference shared agreements. Record all user decisions; only these change agreements. Maintain progress and evidence. Keep follow-ups here without separate TODO files; organize other session notes freely.
+Move, merge, and deduplicate ledgers to keep this shape, keeping every agreement with its scope and reason. Work in the ledger whose scope covers the request; add a child only for a new scope.
 
-Each contract section states its scope and governs acceptance when the request or diff touches it. Other sections provide context; report excluded sections. Clarify unclear scopes or conflicts. Contract and PR scopes are independent.
+Approved plans, routines, and work spanning review stages need a `CONTRACT.md` with YAML frontmatter `status: active`; single-step requests need no ledger. It holds numbered agreements with scope and reason, progress, evidence, and follow-ups. Record all user decisions; only these change agreements.
 
-Read applicable ledgers and ancestor contracts before each stage, after compaction or resumption, and before completion. Resume prior work only under the current request or standing user authorization. Include ledger paths and applicable sections in every report and handoff. Set `status: done` only when the entire contract scope is complete; recurring routines remain active between runs.
+An agreement governs acceptance when the request or diff touches its scope; ask about unclear scopes or conflicts. A PR may cover part of one contract or parts of several.
+
+Create scratch with `mktemp -d "${TMPDIR:-/tmp}/<repo-or-project>-<topic>-XXXXXX"` and link it from the owning ledger. Copy evidence into that ledger before relying on it; never link evidence.
+
+Resume prior work only under the current request or standing user authorization. Read applicable ledgers and ancestor contracts before each stage, after compaction or resumption, and before completion. Include ledger paths and applicable agreements in every report and handoff. Set `status: done` only when the whole contract scope is complete; routines stay active between runs.
 
 ## Tooling and repository safety
 
-Prefer subagents for procedurally complex, long-running, interaction-heavy tasks with easily verifiable outcomes, such as computer use and UI testing. Give each subagent ledger paths and applicable sections, its scope, and verification criteria. Choose the lightest capable model when the harness allows. Across turns, resume a subagent whose context continues; start fresh for independent context.
+Prefer subagents for procedurally complex, long-running, interaction-heavy tasks with easily verifiable outcomes, such as computer use and UI testing. Give each subagent its scope and verification criteria. Choose the lightest capable model when the harness allows. Across turns, resume a subagent whose context continues; start fresh for independent context.
 
 Follow the UNIX philosophy. Prefer short, composable one-off commands and repository scripts for repeatable workflows; no global installs or large throwaway scripts. Run plain commands from the current directory using the project's environment. A denial is a permission fact, not grounds to degrade or hand back. Continue independent work while dependencies run; collect required local verification and delegated results before reporting completion. If only external work remains, report the blocker and next action without polling.
 
@@ -146,4 +154,4 @@ Git inspection and worktree creation (including branches and metadata) are allow
 
 ## Closing check
 
-Recheck outcomes, scope, accepted decisions, and evidence against applicable ledger sections or the request item by item. Support factual claims with checks run this session or label speculation. At completion, confirm required review boundaries satisfied and no remaining stubs; match each claim to demonstrated behavior and scope, reporting verification gaps and follow-ups separately.
+Recheck outcomes, scope, accepted decisions, and evidence against applicable agreements or the request item by item. Support factual claims with checks run this session or label speculation. At completion, confirm required review boundaries satisfied and no remaining stubs; match each claim to demonstrated behavior and scope, reporting verification gaps and follow-ups separately.

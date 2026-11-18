@@ -5,7 +5,7 @@ description: "Find material correctness, contract, test, compatibility, and arti
 
 # Code Review
 
-Report material defects, excluding style preferences. Target resolution as in `/simplify`: the argument if given, else the branch diff plus uncommitted changes. Include explicit constraints, the authorized implementation stage, and, if present, ledger paths with applicable sections (see `Agent ledgers`) in review inputs. Contracted stubs at intermediate reviews are intentional; hidden assumptions, contradictory contracts, and stubs remaining at completion are findings.
+Report material defects, excluding style preferences. Target resolution as in `/simplify`: the argument if given, else the branch diff plus uncommitted changes. Include explicit constraints, the authorized implementation stage, and, if present, ledger paths with applicable agreements (see `Agent ledgers`) in review inputs. Contracted stubs at intermediate reviews are intentional; hidden assumptions, contradictory contracts, and stubs remaining at completion are findings.
 
 ## Phase 1: Find (5 angles)
 
