@@ -15,7 +15,7 @@ Keep GitHub paragraphs on one line; hard-wrap only fenced blocks and tables.
 
 1. **Preflight.** `git status`, `git log origin/main..HEAD`, `gh pr list --head <branch> --state all`. Disclose unverified remote-tracking ref freshness. Require the completion stage: required review boundaries satisfied, stubs implemented, applicable obligations for this PR satisfied against reconciled ledger sections (see `Agent ledgers`) or the request where no section applies, and verification run or limitations reported. Stop and ask on a pre-existing dirty worktree, the default branch, remote divergence, or a merged/closed PR for this branch; rebasing and force-pushing remain the user's decision.
 
-2. **PR.** `gh pr create`, or reuse the branch's existing **open** PR (`--state open`). Report the URL. Keep title and body concise and readable. Describe the final diff; support claims about jobs, consumers, or data with checks, reusing noted evidence whose assumptions still hold.
+2. **PR.** `gh pr create`, or reuse the branch's existing **open** PR (`--state open`). Report the URL. Learn title conventions from recent commit subjects; keep the body concise and natural. Describe the final diff; support claims about jobs, consumers, or data with checks, reusing noted evidence whose assumptions still hold.
 
 3. **Cleanup.** Run `/cleanup` on the branch diff. Repeat its artifact pass after later artifact changes.
 
