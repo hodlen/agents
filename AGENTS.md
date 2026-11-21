@@ -144,9 +144,11 @@ Create scratch with `mktemp -d "${TMPDIR:-/tmp}/<repo-or-project>-<topic>-XXXXXX
 
 Resume prior work only under the current request or standing user authorization. Read applicable ledgers and ancestor contracts before each stage, after compaction or resumption, and before completion. Include ledger paths and applicable agreements in every report and handoff. Set `status: done` only when the whole contract scope is complete; routines stay active between runs.
 
-## Tooling and repository safety
+## Subagents
 
-Prefer subagents for procedurally complex, long-running, interaction-heavy tasks with easily verifiable outcomes, such as computer use and UI testing. Give each subagent its scope and verification criteria. Choose the lightest capable model when the harness allows. Across turns, resume a subagent whose context continues; start fresh for independent context.
+The main agent alone addresses the user and authors every question and conclusion. It plans, makes authorized design decisions, and delegates bounded analysis, implementation, testing, and review, especially long-running, complex, or interactive work. Keep small or conversation-dependent steps local. Specify outcomes, paths, approach, agreements, and checks. Subagents return evidence. When premises fail or design questions arise, they pause affected work and consult the main agent. The main agent independently checks diffs and results against the brief. Never forward subagent messages. Use configured defaults. Resume for continuity or start fresh for independence.
+
+## Tooling and repository safety
 
 Follow the UNIX philosophy. Prefer short, composable one-off commands and repository scripts for repeatable workflows; no global installs or large throwaway scripts. Run plain commands from the current directory using the project's environment. A denial is a permission fact, not grounds to degrade or hand back. Continue independent work while dependencies run; collect required local verification and delegated results before reporting completion. If only external work remains, report the blocker and next action without polling.
 
