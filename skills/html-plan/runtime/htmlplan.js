@@ -1,7 +1,6 @@
 /* htmlplan.js — runtime for coding artifacts.
    One file, no dependencies. Registers <doc-*> elements, builds the TOC,
    collects answers/comments/edits into one response, with an optional review receiver.
-   Local review IO contract: ../references/review-io.md
    Pure parsers are exposed on globalThis.HtmlPlan so pack.mjs can lint with them. */
 (function () {
 'use strict';

@@ -1,23 +1,64 @@
 #!/usr/bin/env node
-// Serve one packed plan until its response is saved and acknowledged.
-// stderr: review URL and errors. stdout: exact response Markdown on success.
-// IO contract: ../references/review-io.md
+// Serve one plan until its response is saved and acknowledged.
+// stderr: diagnostics, review URL, and saved response path. stdout: this round's Markdown.
+import { spawnSync } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
-import { readFileSync, statSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
-import { resolve } from 'node:path';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import { text } from 'node:stream/consumers';
 import { finished } from 'node:stream/promises';
+import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 try {
   const { values, positionals } = parseArgs({ options: { out: { type: 'string' } }, allowPositionals: true });
-  if (positionals.length !== 1) throw new Error('Usage: node review.mjs plan.packed.html [--out plan.response.md]');
+  if (positionals.length !== 1) throw new Error('Usage: node review.mjs plan.html [--out plan.response.md]');
   const input = resolve(positionals[0]);
-  const output = resolve(values.out ?? input.replace(/(?:\.packed)?\.html?$/i, '') + '.response.md');
+  const output = values.out === undefined ? undefined : resolve(values.out);
   if (input === output) throw new Error('The response output must differ from the plan input.');
-  const html = readFileSync(input, 'utf8');
-  if (!/<html\b[^>]*\bdata-htmlplan-packed\b/i.test(html)) throw new Error('Expected a packed HTML plan. Run pack.mjs first.');
+  let html = readFileSync(input, 'utf8');
+  if (!/<html\b[^>]*\bdata-htmlplan-packed\b/i.test(html)) {
+    const staging = mkdtempSync(join(tmpdir(), 'html-plan-'));
+    try {
+      const pack = fileURLToPath(new URL('./pack.mjs', import.meta.url));
+      const packed = join(staging, 'plan.html');
+      // Surface authoring diagnostics. The packer's output path belongs to the temporary directory.
+      const bundle = spawnSync(process.execPath, [pack, input, '--root', process.cwd(), '-o', packed], { stdio: ['ignore', 'ignore', 'inherit'] });
+      if (bundle.error) throw bundle.error;
+      if (bundle.status !== 0) throw new Error(`Could not prepare ${input} for review (${bundle.signal ?? 'exit ' + bundle.status}).`);
+      html = readFileSync(packed, 'utf8');
+    } finally {
+      rmSync(staging, { recursive: true, force: true });
+    }
+  }
+
+  const saveResponse = markdown => {
+    if (output !== undefined) {
+      const existing = statSync(output, { throwIfNoEntry: false });
+      if (existing) {
+        const plan = statSync(input);
+        if (existing.dev === plan.dev && existing.ino === plan.ino) {
+          throw new Error('The response output must differ from the plan input.');
+        }
+      }
+      writeFileSync(output, markdown, 'utf8');
+      return output;
+    }
+
+    const stem = input.replace(/(?:\.packed)?\.html?$/i, '') + '.response';
+    for (let version = 0; ; version++) {
+      const path = version === 0 ? `${stem}.md` : `${stem}.v${version}.md`;
+      try {
+        // Claim the filename at submission so concurrent reviewers keep separate files.
+        writeFileSync(path, markdown, { flag: 'wx' });
+        return path;
+      } catch (error) {
+        if (error.code !== 'EEXIST') throw error;
+      }
+    }
+  };
 
   const pagePath = `/${randomBytes(16).toString('hex')}/`;
   const responsePath = `${pagePath}response`;
@@ -68,14 +109,8 @@ try {
         return;
       }
       claimed = accepted = true;
-      const outputIdentity = statSync(output, { throwIfNoEntry: false });
-      if (outputIdentity) {
-        const inputIdentity = statSync(input);
-        if (outputIdentity.dev === inputIdentity.dev && outputIdentity.ino === inputIdentity.ino) {
-          throw new Error('The response output must differ from the plan input.');
-        }
-      }
-      writeFileSync(output, markdown, 'utf8');
+      const savedPath = saveResponse(markdown);
+      console.error(`Saved response to ${savedPath}`);
       response.writeHead(200, { 'Content-Type': 'application/json', Connection: 'close' });
       const acknowledged = finished(response);
       // End unfinished requests only after the ACK connection closes normally.

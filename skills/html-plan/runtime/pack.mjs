@@ -282,10 +282,10 @@ const rel = (p) => relative(process.cwd(), p) || p;
 if (!quiet) {
   console.log(`\n${basename(inPath)}`);
   info.forEach((m) => console.log('  · ' + m));
-  warns.forEach((m) => console.log('  ⚠ ' + m));
-  errors.forEach((m) => console.log('  ✗ ' + m));
+  warns.forEach((m) => console.warn('  ⚠ ' + m));
+  errors.forEach((m) => console.error('  ✗ ' + m));
 }
-if (errors.length) { console.log(`\n✗ ${errors.length} error(s), ${warns.length} warning(s) — fix and re-run.`); process.exit(1); }
+if (errors.length) { console.error(`\n✗ ${errors.length} error(s), ${warns.length} warning(s) — fix and re-run.`); process.exit(1); }
 if (lintOnly) { console.log(`✓ lint clean${warns.length ? ` (${warns.length} warning${warns.length > 1 ? 's' : ''})` : ''}`); process.exit(0); }
 writeFileSync(outPath, packed);
 if (reads.size && (!quiet || argv.includes('--artifact'))) console.log(`  code from ${reads.size} file${reads.size > 1 ? 's' : ''} is now inside the page: ${[...reads].sort().join(', ')}`);
