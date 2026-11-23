@@ -21,7 +21,7 @@ Plan this: $ARGUMENTS
 
 **When the page cites files**, start the command in the source directory (the project root or the folder containing the contract). Pass the full path to `plan.html` if you wrote it elsewhere. For example, with a ledger as your working directory, `src="CONTRACT.md"` reads that ledger's contract.
 
-In Codex with restricted networking, use `exec_command` with `sandbox_permissions="require_escalated"`, a justification for listening on `127.0.0.1`, and `yield_time_ms=1000`. For other installations, use the `runtime/review.mjs` beside this SKILL.md.
+In Codex, use `exec_command` with `tty=true` and `yield_time_ms=1000`. With restricted networking, also set `sandbox_permissions="require_escalated"` and give listening on `127.0.0.1` as the reason. If you replace a review before the reader responds, send Ctrl-C to its session. For other installations, use the `runtime/review.mjs` beside this SKILL.md.
 
 ## The tree
 
