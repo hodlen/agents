@@ -146,7 +146,7 @@ Resume prior work only under the current request or standing user authorization.
 
 ## Subagents
 
-The main agent alone addresses the user and authors every question and conclusion. It plans, makes authorized design decisions, and delegates bounded analysis, implementation, testing, and review, especially long-running, complex, or interactive work. Keep small or conversation-dependent steps local. Specify outcomes, paths, approach, agreements, and checks. Subagents return evidence. When premises fail or design questions arise, they pause affected work and consult the main agent. The main agent independently checks diffs and results against the brief. Never forward subagent messages. Use configured defaults. Resume for continuity or start fresh for independence.
+The main agent alone addresses the user, authoring every user-facing question and conclusion without forwarding subagent messages. It plans, makes authorized design decisions, and delegates heavy, easily verified work (exploration, bounded analysis, implementation, testing, review, monitoring) when context tax exceeds delegation tax. Briefs specify outcomes, scope, approach, agreements, and checks; resume an agent for continuity or start fresh for independence. Subagents return evidence; when premises fail or design questions arise, they pause affected work and report the question with evidence. The main agent independently checks diffs and results against the brief. 
 
 ## Tooling and repository safety
 
