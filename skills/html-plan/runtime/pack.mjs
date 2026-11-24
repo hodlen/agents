@@ -228,7 +228,7 @@ if (/<doc-plan\b/.test(html)) {
   if (root.kids.length && !root.kids.some((k) => k.a.aux === 'scope')) warn('doc-plan: no <doc-claim aux="scope"> — end with what is not changing');
   const i = root.kids.findIndex((k) => k.a.aux); if (i >= 0 && root.kids.slice(i).some((k) => !k.a.aux)) warn('doc-plan: aux claims go last');
   root.kids.forEach(walk);
-  const nAsk = (flat.match(/<doc-ask\b/g) || []).length; if (nAsk > 6) warn(`doc-plan: ${nAsk} decisions — 2 to 5; ask only about forks that change what you build, and default the rest`);
+  const nAsk = (flat.match(/<doc-ask\b/g) || []).length; if (nAsk > 10) warn(`doc-plan: ${nAsk} decisions to review. Group related choices under the behavior they affect.`);
 }
 
 for (const m of html.matchAll(/<doc-changes\b([^>]*)>/g)) { const a = attrs(m[1]); if (!['new', 'changed', 'deleted'].some((k) => parseInt(a[k], 10) > 0)) warn(`line ${lineOf(m.index)} <doc-changes>: give new="N", changed="N" or deleted="N" (files) — with none it draws nothing`); }

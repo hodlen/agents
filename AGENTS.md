@@ -74,15 +74,20 @@ Start investigations with the cheapest falsifying check. When two fixes resting 
 
 ### Contract-first review, top-down refinement
 
-Review promises before implementations accumulate dependencies on them. Start with behavior, invariants, normal/boundary/failure examples, and assumptions; establish interface feasibility before review. New promises need user approval before dependent implementation, as do changes to public or cross-module signatures, external schemas or persisted formats, user-visible behavior, failure semantics, or agreements recorded in the ledger, unless the user explicitly delegates them. Decide other choices yourself and show them at the next review.
+Review promises before implementations accumulate dependencies on them. Start with behavior, invariants, normal/boundary/failure examples, and assumptions; establish interface feasibility before review.
 
-When new evidence contradicts an approved item, pause the work that depends on it and present the evidence; only the user reopens it. Continue independent work. Preparation is sufficient when the next implementation step has a clear contract and a way to verify its result. Failing stubs represent unimplemented behavior.
+Implement and verify directly when the design is settled. Make delegated choices. In stages 1 and 2, pause when an open design decision belongs to the user. Honor requested review boundaries throughout.
 
-1. **Models and contracts.** Write specs, models, signatures, and capability contracts; review meanings, transitions, failures, and ownership.
-2. **Behavior and decomposition.** Implement workflows and domain decisions top down; refine decomposition in the least awkward way and specify unfinished details at their owners. Test decisions, ordering, and failures with IO substitutes; review behavior, decomposition, and assumptions.
-3. **Implementation and composition.** Complete effects, wiring, and stubs into working behavior. Run relevant tests, integration checks, and an authorized live smoke check; report verification gaps.
+For "validate this form's status":
+- Direct: Reuse `STATUSES.includes(value)`.
+- Stage 1: Should the SDK expose `isStatus(value): boolean`?
+- Stage 2: A database `CHECK` would reject existing `legacy` imports. Should imports keep accepting them?
 
-Each review shows code, decisions, new names' domain meanings, assumptions, and gaps. Pause for required user decisions and requested review boundaries; otherwise advance through implementation and verification. Delegated reviewers approve only decisions explicitly entrusted to them. Distinguish unfinished work from regressions.
+1. Models and contracts: Show proposed paths and declaration diffs (models, signatures, shared helpers; omit locals). Identify affected callers. Compare each addition with an existing owner or direct expression. Cover ownership, valid states, transitions, and failures.
+2. Behavior and decomposition: Build workflows top down with IO substitutes and failing stubs at unfinished effects. Use code and tests to show how choices affect ordering, failures, and ownership.
+3. Implementation and composition: Before a large implementation, surface any open design choice that would be costly to reverse. Once settled, wire effects and complete stubs. Run tests, integration checks, and an authorized live smoke check; report gaps.
+
+At a design pause, recommend an option and show what choosing differently changes. Include relevant code, names' meanings, assumptions, and gaps. Hold dependent work, including delegated work, until the user decides. If evidence contradicts an approved decision, present it to the user to reopen it. Continue independent work. Record decisions and delegations in the ledger.
 
 ### Breaking changes
 
@@ -148,7 +153,7 @@ Resume prior work only under the current request or standing user authorization.
 
 The main agent alone addresses the user. It plans, makes authorized design decisions, and writes every question and conclusion without forwarding subagent messages.
 
-Delegate execution by default, including long-running work. Delegation usually costs less than carrying execution context. Run independent tasks in parallel. Keep steps local when briefing costs more. Specify outcomes, scope, approach, agreements, and checks. Resume agents for continuity or start fresh for independence.
+Delegate execution by default, including long-running work. Delegation usually costs less than carrying execution context. Run independent tasks in parallel. Keep steps local when briefing costs more. Specify outcomes, scope, approach, agreements, and checks. Resume agents for continuity or start fresh for independence. On staged work, limit each brief to the current stage and its stop condition.
 
 Subagents return evidence. When premises fail or design questions arise, they pause affected work and bring evidence to the main agent. The main agent independently checks diffs and results against the brief.
 

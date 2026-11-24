@@ -86,21 +86,20 @@ failed    -cancel-> cancelled : Cancel
 ## `doc-calls` — what changes, as call trees
 
 ```html
-<doc-calls title="Scheduling" caption="Tap the second call to open its code.">
+<doc-calls title="Schedule through the API" caption="Tap the second call to open its code.">
 <script type="text/plain">
 ~ <Composer/>                                  @ web/src/composer/Composer.tsx:41
 +   <**SendLaterMenu**/>                       @ web/src/composer/SendLaterMenu.tsx:12
 +     POST /api/scheduled                      @ web/src/api/scheduled.ts:9
 -   legacyQueue(message)                       @ web/src/composer/queue.ts:30   -- no longer used
-?   trackScheduled()                           @ web/src/metrics.ts:14          -- proposed; strike it if not wanted
-    saveDraft()                                @ web/src/drafts.ts:22
 </script>
 </doc-calls>
 ```
 
-- One call per line. Column 0 is the mark: `+` new call, `-` removed, `~` changed entrypoint, `?` proposed (drawn dashed), a space for context. An entrypoint's text starts at column 2, marked or not. Each level adds 2 spaces.
+- One call per line. For an interface review, mark each edit in column 0: `+` added, `-` removed, `~` modified. Other call trees also support `?` for an optional call and a space for context. An entrypoint's text starts at column 2. Each level adds 2 spaces.
 - `**bold**` marks a **new symbol**. A `+` row without bold is a new call to something that exists.
 - End a line with `@ path:line` and, if needed, `-- one clause`. A blank line starts a new entrypoint.
+- For a caller edit, use the line where it invokes the callee. Attach its `doc-code diff` with `<template for="callerSymbol">` inside `doc-calls`. Use the callee row for the declaration.
 - A tap on a row opens the code there. Pack embeds ±6 lines when it can find the file (`--root <repo>`, `ref="<sha>"`), so always write `@ path:line`. Files that do not exist yet open nothing. For a new function in a file that exists, cite the line it goes after. Either way, give the important one a level-3 claim with a sketch; a tap then opens that claim as well.
 - The reader can **strike** or comment on any marked row: the two buttons show on hover, or after a tap. A struck row takes its subtree with it, and the response lists it. `files` adds a pane of files touched. `<template for="symbol">…</template>` hangs any block off a row.
 - Keep one tree under about 15 rows in a plan.

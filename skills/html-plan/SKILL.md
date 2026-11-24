@@ -17,7 +17,7 @@ Plan this: $ARGUMENTS
    node "$HOME/.agents/skills/html-plan/runtime/review.mjs" plan.html
    ```
 
-3. **Get the response from the same session.** On **User Response**, the command saves a new Markdown file beside the plan, prints its absolute path and the reader's response, then exits. Wait for that response before building.
+3. **Get the response from the same session.** On **User Response**, the command saves a new Markdown file beside the plan, prints its absolute path and the reader's response, then exits. Honor requested review stops. While a user decision is open, hold work that depends on it.
 
 **When the page cites files**, start the command in the source directory (the project root or the folder containing the contract). Pass the full path to `plan.html` if you wrote it elsewhere. For example, with a ledger as your working directory, `src="CONTRACT.md"` reads that ledger's contract.
 
@@ -33,11 +33,13 @@ Each level answers one question. The question picks the exhibit. The top level h
 | `details.thread` | Why? | — | the user's own words, as closed quotes |
 | 1 | What can someone now do or see? | a behaviour | `doc-mock`; `doc-machine` if it has a lifecycle |
 | 2 | How does that work? | one entrypoint, rule or record | `doc-calls`, `doc-schema`, or short `doc-code` |
-| 3 | Where? | `file:line` | `doc-code` |
+| 3 (optional) | Which lines change? | `file:line` | `doc-code diff` or a new declaration |
 
 1. **Read first.** Find the entrypoints, records and screens the change touches. Note exact paths, lines and the user's words.
 2. **Write the level-1 claims** and read them aloud. Fix them before anything else.
-3. **Add the how and where claims, then the exhibits, then the decisions.** Save the page where the project keeps docs, or in the task state directory (see `Agent ledgers`).
+3. **Put each edit under its behavior.** Show the proposed `doc-code diff` or `doc-schema diff`. Mark new paths and put each public or shared declaration on its own line for comments. Save the page with the project docs or in the task ledger.
+
+For an interface review, name the interface and callers that need edits in the closed tree. Title the call tree with its option and show only changed callers and calls (`~`, `+`, `-`). Point each caller row at the invocation in its body. Open its before/after diff on that row. Link the callee to the declaration diff. Omit the tree when no caller needs an edit. Before a large change, show which modules each option touches and whether the existing owner can do the work.
 
 When presenting an existing contract, distinguish what it records as built, proposed, or still unknown. Ask only about choices the contract leaves open. If all choices are settled, the reader can still comment and press **Respond**. Use a short source excerpt as the exhibit, for example `<doc-code src="CONTRACT.md" lines="18-20" lang="md" wrap></doc-code>`.
 
@@ -76,9 +78,10 @@ Replace the sample request, file counts, and exhibits with evidence for the actu
     </doc-ask>
     <doc-claim> <!-- 1.1 · HOW -->
       <p>The list sorts pinned notes by the time of the pin.</p>
-      <doc-code title="Note list query - sketch" lang="sql"><script type="text/plain">
-SELECT title FROM notes
-ORDER BY pinned_at DESC NULLS LAST, title, id;
+      <doc-code diff file="src/notes/list.sql" start="1" title="Notebook list query (changed)" lang="sql"><script type="text/plain">
+ SELECT title FROM notes
+-ORDER BY title, id;
++ORDER BY pinned_at DESC NULLS LAST, title, id;
       </script></doc-code>
     </doc-claim>
   </doc-claim>
@@ -108,45 +111,55 @@ Choose the example that answers the reader's question:
 | Which calls change? | A [call tree with links to code](references/blocks.md#doc-calls--what-changes-as-call-trees). |
 | Which fields can I edit? | An [editable schema in the project's language](references/blocks.md#doc-schema--a-data-shape-as-text-in-its-own-language). |
 
-To let the reader open a code sketch from a call, nest its location under the claim that holds the call tree. The [scheduled-send plan](examples/scheduled-send.html) uses this pattern.
+In this example the SDK can read the account time zone. Put these blocks in the level-2 scheduling claim. Match each `createScheduled` row to the declaration with `@ path:line` and `at`, as in the [scheduled-send plan](examples/scheduled-send.html).
 
 ```html
-<doc-calls title="Scheduled messages" caption="Select the call to see its code.">
+<doc-calls title="Caller sets the time zone" caption="The composer and CLI each pass a zone." context="1">
   <script type="text/plain">
-+ **createScheduled**(req) @ server/src/scheduled/routes.ts:18
+~ scheduleFromComposer(draft)       @ web/src/composer/schedule.ts:26
+~   createScheduled(draft, zone)    @ sdk/src/scheduled.ts:18
+~ scheduleFromCli(draft)            @ cli/src/schedule.ts:33
+~   createScheduled(draft, zone)    @ sdk/src/scheduled.ts:18
   </script>
+  <template for="scheduleFromComposer"><doc-code diff file="web/src/composer/schedule.ts" start="26" lang="ts"><script type="text/plain">
+-return createScheduled(draft)
++return createScheduled(draft, composer.timeZone)
+  </script></doc-code></template>
+  <template for="scheduleFromCli"><doc-code diff file="cli/src/schedule.ts" start="33" lang="ts"><script type="text/plain">
+-return createScheduled(draft)
++return createScheduled(draft, options.timeZone)
+  </script></doc-code></template>
 </doc-calls>
-<doc-claim at="server/src/scheduled/routes.ts:18"> <!-- 1.1.1 · WHERE; at= matches a call row's @ path:line -->
-  <p><b>routes.ts:18</b> · createScheduled()</p>
-  <doc-code title="routes.ts - sketch" lang="ts"><script type="text/plain">
-export async function createScheduled(req: Request) {
-  const session = requireSession(req)
-  await assertUnderLimit(session.userId)
-  const row = buildScheduled(await req.json(), session)
-  await store.insert(row)
-  return json({ id: row.id, sendAt: row.sendAt }, 201)
-}
+<doc-ask id="zone"><p>Who sets the time zone for a local send time?</p>
+  <label><input type="radio" name="zone" value="account" checked>SDK reads the account setting. Both callers keep their calls.</label>
+  <label><input type="radio" name="zone" value="caller">Callers choose. The composer and CLI must each pass a zone.</label>
+</doc-ask>
+<doc-claim at="sdk/src/scheduled.ts:18">
+  <p><b>scheduled.ts:18</b> - createScheduled()</p>
+  <doc-code diff file="sdk/src/scheduled.ts" start="18" title="If callers choose the zone" lang="ts"><script type="text/plain">
+-export declare function createScheduled(draft: Draft): Promise<Scheduled>
++export declare function createScheduled(draft: Draft, zone: TimeZone): Promise<Scheduled>
   </script></doc-code>
 </doc-claim>
 ```
 
 ## Rules
 
-The review command checks 2, 3, 5, 6 (the count), 7 and 11. The rest are yours to check.
+The review command checks 2, 3, 5, 7 and 11. The rest are yours to check.
 
 1. **Split the top level by behaviour.** Never by file, layer or order of work. Behaviour is the one split the reader can judge without reading code.
 2. **Every claim at levels 1 and 2 is a sentence that can be true or false.** “A user can hold 50 scheduled messages at most.” Not “Message limit”. About 12 words at most. A level-3 claim is only a place: `file:line · symbol`.
 3. **One exhibit per claim.** A second exhibit means a second claim.
 4. **The closed tree is the summary.** Read only the level-1 claims aloud. They must tell the whole change. So write no TL;DR, no sections and no steps list.
 5. **At most 5 children and 3 levels.**
-6. **A decision sits on the claim it changes**, after the exhibit and before any child claims. Check the option you would pick. If an option removes a claim, say so: “claim 4 goes”. Ask only about forks that change what you build: 2 to 5 per plan.
+6. **A decision sits on the claim it changes**, after the exhibit and before any child claims. Ask only about open design choices the reader needs to make. Check the option you recommend and show what each option changes. If all choices are settled, use comments for requested feedback.
 7. **End with `aux="shared"`**, for a record or part several claims use (skip it if there is none), **and `aux="scope"`**, for what is not changing.
-8. **Real over drawn.** Real paths and line numbers for code that exists; fill it with `src="path" lines="a-b"`. Mark code that does not exist yet as a sketch in its title. Quote the user's words; do not reword them.
+8. **Use real sources.** Cite the baseline path and line for a proposed edit. Use `src="path" lines="a-b"` for a presentation of existing code. Mark new code as a sketch in its title. Quote the user's words; do not reword them.
 9. **Schemas are text in the project's own language**: TypeScript, SQL, protobuf. Never a table or a made-up notation.
 10. **A state machine shows the screen for each state** when the state changes what the user sees. Place its states on a grid.
 11. **The page starts with a title.** The `h1` names the change and the place in 3 to 7 words: “Scheduling Sent Messages in PostBox”. It is not a sentence and not the goal. Put nothing above it: no “Plan · project” line. The level-1 claims tell what changes.
 
-For a change with no visible behaviour, such as a refactor, make level 1 the guarantees: “Nothing a caller sees changes.”, “Each store has one owner.”
+For a change with no visible behaviour, such as a refactor, make level 1 the guarantees: “The API returns the same results.”, “Each store has one owner.”
 
 ## Words
 
