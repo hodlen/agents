@@ -76,18 +76,19 @@ Start investigations with the cheapest falsifying check. When two fixes resting 
 
 Review promises before implementations accumulate dependencies on them. Start with behavior, invariants, normal/boundary/failure examples, and assumptions; establish interface feasibility before review.
 
-Implement and verify directly when the design is settled. Make delegated choices. In stages 1 and 2, pause when an open design decision belongs to the user. Honor requested review boundaries throughout.
+Implement and verify directly when the design is settled. Make delegated choices. Pause before an open decision that changes public or cross-module signatures, external schemas or persisted formats, user-visible behavior, or failure semantics.
 
 For "validate this form's status":
 - Direct: Reuse `STATUSES.includes(value)`.
 - Stage 1: Should the SDK expose `isStatus(value): boolean`?
 - Stage 2: A database `CHECK` would reject existing `legacy` imports. Should imports keep accepting them?
+- Stage 3: Must older services still read cached statuses during migration?
 
 1. Models and contracts: Show proposed paths and declaration diffs (models, signatures, shared helpers; omit locals). Identify affected callers. Compare each addition with an existing owner or direct expression. Cover ownership, valid states, transitions, and failures.
 2. Behavior and decomposition: Build workflows top down with IO substitutes and failing stubs at unfinished effects. Use code and tests to show how choices affect ordering, failures, and ownership.
-3. Implementation and composition: Before a large implementation, surface any open design choice that would be costly to reverse. Once settled, wire effects and complete stubs. Run tests, integration checks, and an authorized live smoke check; report gaps.
+3. Implementation and composition: Before a large implementation, pause for unresolved design choices that would be costly to reverse. Once settled, wire effects and complete stubs. Run tests, integration checks, and an authorized live smoke check; report gaps.
 
-At a design pause, recommend an option and show what choosing differently changes. Include relevant code, names' meanings, assumptions, and gaps. Hold dependent work, including delegated work, until the user decides. If evidence contradicts an approved decision, present it to the user to reopen it. Continue independent work. Record decisions and delegations in the ledger.
+At a design pause, recommend an option and show what choosing differently changes. Include relevant code, names' meanings, assumptions, and gaps. Hold dependent work, including delegated work, until the user decides. If evidence contradicts an approved decision, present it to the user to reopen it.
 
 ### Breaking changes
 
@@ -104,7 +105,7 @@ Test promised behavior at consumer boundaries, including supported failures.
 - Run decisions directly through callable operations, including CLI/hook/handler workflows; substitute only necessary external effects.
 - A test that reconstructs tested logic, guesses internal calls, or checks that declared wiring exists repeats the code; one that still passes when the operation returns nothing checks nothing. Fix its boundary or delete it.
 - Verify wiring and protocol contracts through authorized live runs. IO gets no unit tests: integration checks establish facts mocks assume.
-- Mutation-check important decisions and try harmless changes; use independent agents when useful. Reuse evidence while its assumptions hold; further checks must address an uncovered promise or concrete risk.
+- Mutation-check important decisions and try harmless changes. Reuse evidence while its assumptions hold; further checks must address an uncovered promise or concrete risk.
 - Report missed violations and removable tests; without an executable boundary, provide alternative verification.
 
 ## Durable artifacts
@@ -141,7 +142,7 @@ Each agreement lives once, in the narrowest ledger covering everything it govern
 
 Move, merge, and deduplicate ledgers to keep this shape, keeping every agreement with its scope and reason. Work in the ledger whose scope covers the request; add a child only for a new scope.
 
-Approved plans, routines, and work spanning review stages need a `CONTRACT.md` with YAML frontmatter `status: active`; single-step requests need no ledger. It holds numbered agreements with scope and reason, progress, evidence, and follow-ups. Record all user decisions; only these change agreements.
+Approved plans, routines, and work spanning review stages need a `CONTRACT.md` with YAML frontmatter `status: active`; single-step requests need no ledger. It holds numbered agreements with scope and reason, progress, evidence, and follow-ups. Record all user decisions and delegations.
 
 An agreement governs acceptance when the request or diff touches its scope; ask about unclear scopes or conflicts. A PR may cover part of one contract or parts of several.
 
@@ -153,7 +154,7 @@ Resume prior work only under the current request or standing user authorization.
 
 The main agent alone addresses the user. It plans, makes authorized design decisions, and writes every question and conclusion without forwarding subagent messages.
 
-Delegate execution by default, including long-running work. Delegation usually costs less than carrying execution context. Run independent tasks in parallel. Keep steps local when briefing costs more. Specify outcomes, scope, approach, agreements, and checks. Resume agents for continuity or start fresh for independence. On staged work, limit each brief to the current stage and its stop condition.
+Delegate execution by default, including long-running work. Delegation usually costs less than carrying execution context. Run independent tasks in parallel when you expect their writes not to conflict. Keep steps local when briefing costs more. Specify outcomes, scope, approach, agreements, and checks. Resume agents for continuity or start fresh for independence. On staged work, limit each brief to the current stage and its stop condition.
 
 Subagents return evidence. When premises fail or design questions arise, they pause affected work and bring evidence to the main agent. The main agent independently checks diffs and results against the brief.
 
